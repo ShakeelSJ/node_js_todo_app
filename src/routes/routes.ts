@@ -1,22 +1,28 @@
-import express, { Request, Response, Router } from "express";
+import express, { Request, Response } from "express";
 import { Todo } from "../models/user_model";
 
 const router = express.Router();
 
-// Post Request
+//Post request
+
 router.post("/add", async (req: Request, res: Response) => {
   const { title, description } = req.body;
+
   const dataItem = Todo.set({ title, description });
+
   await dataItem.save();
+
   return res.status(200).json({
     data: dataItem,
   });
 });
 
-// Get Request
+//Get request
+
 router.get("/", async (req: Request, res: Response) => {
   try {
     const dataItem = await Todo.find({});
+
     res.status(200).json({
       data: dataItem,
     });
@@ -24,33 +30,47 @@ router.get("/", async (req: Request, res: Response) => {
     console.log(error);
   }
 });
-// Delete Request
+
+//Delete Request
+
 router.delete("/delete", async (req: Request, res: Response) => {
   const filter = {
-    title: req.body.title,
+    id: req.body.id,
   };
+
   const dataItem = await Todo.deleteOne(filter)
-    .then((data) => res.json({ data: data }))
+    .then((data) =>
+      res.json({
+        data: data,
+      })
+    )
     .catch((error) => {
       return res.send(error);
     });
 });
-// Update Request
-router.put("/update", async (req: Request, res: Response) => {
-    const filter = {
-        title: req.body.title,
-    };
-    const updateData = {
-        description: req.body.description,
-    };
 
-    const dataItem = await Todo.updateOne(filter, updateData,{
-        new:true,
-    })
-        .then((data) => res.json({ data: data }))
-        .catch((error) => {
-            return res.send(error);
-        });
+//Update request
+router.put("/update", async (req: Request, res: Response) => {
+  const filter = {
+    id: req.body.id,
+  };
+
+  const updatedData = {
+    title: req.body.title,
+    description: req.body.description,
+  };
+
+  const dataItem = await Todo.updateOne(filter, updatedData, {
+    new: true,
+  })
+    .then((data) =>
+      res.json({
+        data: data,
+      })
+    )
+    .catch((error) => {
+      return res.send(error);
+    });
 });
 
 export { router };
